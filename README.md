@@ -9,7 +9,7 @@ Sentinel is a 3-agent system that tests a target agent for prompt-injection and 
    python -m venv venv
    source venv/bin/activate
    ```
-2. Install dependencies:
+2. Install dependencies (including `google-adk` and `fastmcp`):
    ```bash
    pip install -r requirements.txt
    ```
