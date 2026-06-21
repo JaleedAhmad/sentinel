@@ -1,0 +1,16 @@
+{
+  "naive": {
+    "runs": 3,
+    "total_attempts": 0,
+    "successful_exploits": 0,
+    "max_severity": 0,
+    "success_rate_by_skill": {}
+  },
+  "nudged": {
+    "runs": 3,
+    "total_attempts": 0,
+    "successful_exploits": 0,
+    "max_severity": 0,
+    "success_rate_by_skill": {}
+  }
+}

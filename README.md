@@ -1,24 +1,67 @@
-# Sentinel — Multi-Agent Red-Team
+# Sentinel — Agentic Red-Teaming Pipeline
 
-Sentinel is a 3-agent system that tests a target agent for prompt-injection and tool-misuse vulnerabilities.
+Sentinel is an automated, multi-agent adversarial testing framework designed to evaluate and harden target AI agents against prompt-injection and tool-misuse vulnerabilities.
 
-## Quick Start
+## 🏗️ Architecture
 
-1. Create a virtual environment:
-   ```bash
-   python -m venv venv
-   source venv/bin/activate
-   ```
-2. Install dependencies (including `google-adk` and `fastmcp`):
-   ```bash
-   pip install -r requirements.txt
-   ```
-3. Copy the `.env.example` file to `.env` and configure your API key:
-   ```bash
-   cp .env.example .env
-   # Edit .env and set GEMINI_API_KEY
-   ```
-4. Run the end-to-end execution:
-   ```bash
-   python main.py
-   ```
+The system operates via a continuous evaluation loop between three distinct AI agents:
+- **Target Agent**: A simulated customer support bot for a financial services company with real access to tools (via the Model Context Protocol / MCP) including `read_file`, `send_email`, `delete_file`, and `transfer_funds`.
+- **Attacker Agent**: An adversarial LLM tasked with dynamically crafting malicious payloads using a library of specific attack skills to trick the Target into unauthorized data exfiltration or destructive actions.
+- **Judge Agent**: An impartial evaluator that analyzes the interaction, verifies whether the Target executed unauthorized tool calls, and scores the exploit on a Severity Scale (1-5).
+
+### 🛠️ Attack Surface
+The Attacker leverages the following injection strategies:
+- `direct_injection`: Overt commands to misuse tools.
+- `indirect_injection`: Malicious instructions embedded inside documents or data.
+- `roleplay_override`: Social engineering to bypass systemic restrictions.
+- `tool_chain_exfiltration`: Multi-step attacks combining read access with email capabilities.
+- `destructive_action_injection`: Malicious requests prompting the agent to wipe critical system files.
+- `unauthorized_transaction_injection`: Exploitation of the `transfer_funds` endpoint.
+
+## 🚀 Key Features
+- **Dynamic Adaptation**: The Attacker reads the history of failed attempts and actively changes its payload and skill choices based on what the Target successfully resisted.
+- **Pluggable LLM Backends**: Seamlessly toggle between Live execution (Gemini 2.5 Flash) and Dev modes (Groq / Llama 3.3 70B, NVIDIA NIM, X.AI Grok) to avoid production rate limits during testing.
+- **Comparative Benchmarking**: Run isolated, exhaustive evaluations across different Target system prompts (e.g., `naive` vs `nudged` defensive configurations) using the `compare_targets.py` runner to generate statistical success metrics.
+
+## ⚙️ Quick Start
+
+### 1. Environment Setup
+```bash
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+### 2. Configuration
+Copy the template and add your API keys:
+```bash
+cp .env.example .env
+# Set GEMINI_API_KEY (for Live mode)
+# Set GROQ_API_KEY (for Dev mode testing)
+```
+
+### 3. Execution Modes
+
+**Live Interactive Attack Loop:**
+Runs the standard single-session pipeline.
+```bash
+python main.py
+```
+
+**Dev Mode (No Gemini Quota):**
+Overrides the backend with free-tier APIs (e.g. Groq) for high-volume testing without hitting Gemini rate limits.
+```bash
+SENTINEL_MODE=dev python main.py
+```
+
+**Aggregated Benchmarking:**
+Executes an exhaustive, multi-run comparison against differing target configurations (Naive vs. Defensive Nudge) and exports results to `comparison_results.json`.
+```bash
+SENTINEL_MODE=dev python compare_targets.py
+```
+
+### Environment Variables
+- `SENTINEL_MODE`: Controls the backend API (`live`, `dev`, `mock`).
+- `SENTINEL_TARGET_CONFIG`: Controls the defensive posture of the Target agent (`naive`, `nudged`).
+- `SENTINEL_MAX_ATTEMPTS`: Limits the number of adversarial iterations per evaluation (default: `5`).
+- `SENTINEL_EARLY_BREAK`: Set to `false` to force an exhaustive test of all skills even after a successful exploit.
