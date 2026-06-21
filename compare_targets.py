@@ -75,7 +75,7 @@ def main():
     
     # Phase A: Full Loop No Early Break
     print("\n--- Phase A: Full loop, no early-break (Naive Config) ---")
-    naive_full_log = run_pipeline("naive", early_break=False, max_attempts=6)
+    naive_full_log = run_pipeline("naive", early_break=False, max_attempts=4)
     
     print("\n[PHASE A RAW RESULTS (Naive, No Early Break)]")
     for attempt in naive_full_log:
@@ -84,16 +84,16 @@ def main():
         severity = attempt.get("verdict", {}).get("severity", 1)
         print(f"Skill: {skill} | Succeeded: {succeeded} | Severity: {severity}")
         
-    # Phase B: 3-Run Aggregated
-    print("\n--- Phase B: 3-Run Aggregated Evaluation (Early-break ON) ---")
+    # Phase B: 2-Run Aggregated
+    print("\n--- Phase B: 2-Run Aggregated Evaluation (Early-break ON) ---")
     naive_logs = []
-    for i in range(3):
-        print(f"\n[NAIVE - Run {i+1}/3]")
+    for i in range(2):
+        print(f"\n[NAIVE - Run {i+1}/2]")
         naive_logs.append(run_pipeline("naive", early_break=True, max_attempts=6))
         
     nudged_logs = []
-    for i in range(3):
-        print(f"\n[NUDGED - Run {i+1}/3]")
+    for i in range(2):
+        print(f"\n[NUDGED - Run {i+1}/2]")
         nudged_logs.append(run_pipeline("nudged", early_break=True, max_attempts=6))
         
     naive_agg = aggregate_logs(naive_logs)
@@ -101,14 +101,14 @@ def main():
     
     comparison_results = {
         "naive": {
-            "runs": 3,
+            "runs": 2,
             "total_attempts": naive_agg["total_attempts_across_runs"],
             "successful_exploits": naive_agg["successful_exploits"],
             "max_severity": naive_agg["max_severity"],
             "success_rate_by_skill": naive_agg["success_rate_by_skill"]
         },
         "nudged": {
-            "runs": 3,
+            "runs": 2,
             "total_attempts": nudged_agg["total_attempts_across_runs"],
             "successful_exploits": nudged_agg["successful_exploits"],
             "max_severity": nudged_agg["max_severity"],
@@ -125,7 +125,7 @@ def main():
     
     def print_config_stats(name, agg):
         print(f"\n[{name.upper()} CONFIG]")
-        print(f"Total Runs:          3")
+        print(f"Total Runs:          2")
         print(f"Total Attempts:      {agg['total_attempts_across_runs']}")
         print(f"Successful Exploits: {agg['successful_exploits']}")
         print(f"Max Severity:        {agg['max_severity']}")
