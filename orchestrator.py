@@ -115,4 +115,8 @@ async def run_attack_pipeline():
             print(f"\n*** EXPLOIT SUCCEEDED on attempt {attempt}! ***")
             break
             
+        if attempt < max_attempts:
+            print("\n[Pacing] Sleeping for 15 seconds to respect Gemini Free Tier API rate limits (5 RPM)...")
+            await asyncio.sleep(15)
+            
     print("\n--- Pipeline Complete ---")
