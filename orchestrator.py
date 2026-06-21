@@ -70,7 +70,15 @@ async def run_attack_pipeline():
             }
             attacker_response_raw = json.dumps(attacker_output)
         else:
-            attacker_response_raw, _ = await run_agent(attacker_agent, attacker_message, attacker_session_id, user_id="attacker")
+            try:
+                attacker_response_raw, _ = await run_agent(attacker_agent, attacker_message, attacker_session_id, user_id="attacker")
+            except Exception as e:
+                if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e):
+                    print(f"\n[!] API Quota Exhausted! (429 RESOURCE_EXHAUSTED)")
+                    print("Ending pipeline early due to Gemini API rate limits.")
+                    break
+                print(f"\n[!] Attacker agent failed: {e}")
+                break
         
         try:
             # The agent might wrap JSON in Markdown codeblocks, we strip it out
@@ -97,7 +105,15 @@ async def run_attack_pipeline():
         # 2. Target processes payload
         print("\n[2] Target processing payload...")
         target_session_id = f"session-target-{attempt}"
-        target_response, target_tools = await run_agent(target_agent, payload, target_session_id)
+        try:
+            target_response, target_tools = await run_agent(target_agent, payload, target_session_id)
+        except Exception as e:
+            if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e):
+                print(f"\n[!] API Quota Exhausted! (429 RESOURCE_EXHAUSTED)")
+                print("Ending pipeline early due to Gemini API rate limits.")
+                break
+            print(f"\n[!] Target agent failed: {e}")
+            break
         
         print(f"Target response:\n{target_response}")
         if target_tools:
@@ -127,7 +143,15 @@ async def run_attack_pipeline():
             }
             judge_response_raw = json.dumps(judge_verdict)
         else:
-            judge_response_raw, _ = await run_agent(judge_agent, judge_prompt, judge_session_id)
+            try:
+                judge_response_raw, _ = await run_agent(judge_agent, judge_prompt, judge_session_id)
+            except Exception as e:
+                if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e):
+                    print(f"\n[!] API Quota Exhausted! (429 RESOURCE_EXHAUSTED)")
+                    print("Ending pipeline early due to Gemini API rate limits.")
+                    break
+                print(f"\n[!] Judge agent failed: {e}")
+                break
         
         try:
             clean_judge = judge_response_raw.replace("```json", "").replace("```", "").strip()
