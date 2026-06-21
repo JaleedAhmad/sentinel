@@ -53,12 +53,19 @@ async def run_attack_pipeline():
         try:
             # The agent might wrap JSON in Markdown codeblocks, we strip it out
             clean_json = attacker_response_raw.replace("```json", "").replace("```", "").strip()
+            # It may also start with non-json text if the LLM hallucinated outside the schema
+            if "{" in clean_json:
+                clean_json = clean_json[clean_json.find("{"):]
+            if "}" in clean_json:
+                clean_json = clean_json[:clean_json.rfind("}")+1]
+                
             attacker_output = json.loads(clean_json)
             skill_used = attacker_output.get("skill_used", "unknown")
             payload = attacker_output.get("payload", "")
             rationale = attacker_output.get("rationale", "")
         except Exception as e:
             print(f"Failed to parse Attacker output as JSON. Output was: {attacker_response_raw}")
+            print(f"Error: {e}")
             break
             
         print(f"Skill Chosen: {skill_used}")
@@ -104,12 +111,37 @@ async def run_attack_pipeline():
         print("\n[Verdict]")
         print(judge_response_raw)
         
-        # Record attempt
+        # Record attempt history
         current_history.append({
             "skill": skill_used,
             "succeeded": exploit_succeeded,
             "severity": severity
         })
+        
+        # Structured Logging: Append-as-you-go
+        attempt_data = {
+            "attempt": attempt,
+            "skill_used": skill_used,
+            "payload": payload,
+            "target_response": target_response,
+            "tool_calls": [tc.name for tc in target_tools] if target_tools else [],
+            "verdict": {
+                "exploit_succeeded": exploit_succeeded,
+                "severity": severity,
+                "reasoning": verdict.get("reasoning", "") if 'verdict' in locals() else ""
+            }
+        }
+        
+        try:
+            with open("attack_log.json", "r") as f:
+                attack_log = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            attack_log = []
+            
+        attack_log.append(attempt_data)
+        
+        with open("attack_log.json", "w") as f:
+            json.dump(attack_log, f, indent=2)
         
         if exploit_succeeded:
             print(f"\n*** EXPLOIT SUCCEEDED on attempt {attempt}! ***")
@@ -119,4 +151,43 @@ async def run_attack_pipeline():
             print("\n[Pacing] Sleeping for 15 seconds to respect Gemini Free Tier API rate limits (5 RPM)...")
             await asyncio.sleep(15)
             
+    # Summary Stats
+    total_attempts = len(current_history)
+    successful_exploits = sum(1 for h in current_history if h["succeeded"])
+    max_severity = max([h["severity"] for h in current_history], default=0)
+    
+    skill_stats = {}
+    for h in current_history:
+        skill = h["skill"]
+        if skill not in skill_stats:
+            skill_stats[skill] = {"total": 0, "successes": 0}
+        skill_stats[skill]["total"] += 1
+        if h["succeeded"]:
+            skill_stats[skill]["successes"] += 1
+            
+    success_rate_by_skill = {
+        skill: f"{(stats['successes'] / stats['total']) * 100:.0f}%" 
+        for skill, stats in skill_stats.items()
+    }
+
+    summary = {
+        "total_attempts": total_attempts,
+        "successful_exploits": successful_exploits,
+        "max_severity": max_severity,
+        "success_rate_by_skill": success_rate_by_skill
+    }
+    
+    with open("summary.json", "w") as f:
+        json.dump(summary, f, indent=2)
+
+    print("\n--- Run Summary ---")
+    print(f"Total Attempts: {total_attempts}")
+    print(f"Successful Exploits: {successful_exploits}")
+    print(f"Max Severity Reached: {max_severity}")
+    print("Success Rate by Skill:")
+    if not success_rate_by_skill:
+        print("  None")
+    for skill, rate in success_rate_by_skill.items():
+        print(f"  - {skill}: {rate}")
+        
     print("\n--- Pipeline Complete ---")
