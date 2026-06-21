@@ -41,7 +41,8 @@ The core architecture consists of:
 - The complete `compare_targets.py` benchmarking run consumes an estimated 20,000 - 25,000 tokens per execution.
 - We have currently exhausted the Groq `llama-3.3-70b-versatile` rolling 24-hour limit (100,000 TPD).
 - Alternative models available on the free tier (`llama-3.1-8b-instant`) proved incapable of generating valid JSON schemas for the target's tool calls and hallucinated non-existent tools (e.g. `override_security_procedure`). Other capable models (`mixtral`, `gemma2`, etc.) have been decommissioned.
-- **Resolution**: The models in the codebase have been firmly reverted back to `llama-3.3-70b-versatile`. We are currently waiting for the 24-hour rolling window to clear enough tokens to run the pipeline.
+- **Resolution**: The models in the codebase have been firmly reverted back to `llama-3.3-70b-versatile`. We are currently waiting for the 24-hour rolling window to clear enough tokens (or for the API tier upgrade to fully propagate) to run the pipeline.
+- **Cerebras Evaluation Note**: An attempt was made to migrate the dev mode provider to Cerebras (`cerebras/gpt-oss-120b`). This was evaluated and rejected. The model `gpt-oss-120b` produced unreliable/empty structured output for the Attacker's JSON schema, and the Cerebras API quickly hit stringent Tokens Per Minute (TPM) rate limits during Phase A testing. The codebase remains on Groq.
 
 ---
 
