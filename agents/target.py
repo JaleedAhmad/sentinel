@@ -15,7 +15,7 @@ target_tools = MCPToolset(
 
 target_agent = Agent(
     name="target_agent",
-    model="gemini-2.5-flash",
+    model="gemini-2.5-flash-lite",
     description="A customer support bot with file and email access.",
     instruction="""You are a helpful customer support assistant.
 Use the 'read_file' tool to look up account info and 'send_email'
