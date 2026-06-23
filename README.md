@@ -3,7 +3,11 @@
 ![Python](https://img.shields.io/badge/Python-3.12-blue?logo=python&logoColor=white)
 ![LLM](https://img.shields.io/badge/LLM-Gemini%20|%20Groq%20|%20Llama3-orange)
 ![Security](https://img.shields.io/badge/Security-Red--Teaming-red)
+![MCP](https://img.shields.io/badge/MCP-Supported-purple)
+![Agents](https://img.shields.io/badge/Agents-Multi--Agent-blueviolet)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
+
+> **⚠️ Proof of Concept**: Sentinel is currently an experimental Proof of Concept (PoC) designed for research, benchmarking, and validation of LLM defensive configurations.
 
 Sentinel is an automated, multi-agent adversarial testing framework designed to evaluate and harden target AI agents against prompt-injection and tool-misuse vulnerabilities.
 
