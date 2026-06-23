@@ -16,15 +16,7 @@ Sentinel is an automated, multi-agent adversarial testing framework designed to 
 
 ## 🏗️ Architecture
 
-```mermaid
-graph TD
-    O((Orchestrator)) -->|Spawns & Feeds History| A[Attacker Agent]
-    A -->|Generates Malicious Payload| T(Target Agent)
-    T -->|Executes/Refuses| C{Tool Execution / MCP}
-    T -->|Returns Response| J[Judge Agent]
-    C -->|Tool Results| J
-    J -->|Verdict & Severity Score| O
-```
+![Sentinel Architecture](architecture.svg)
 
 The system operates via a continuous evaluation loop between three distinct AI agents:
 - **Target Agent**: A simulated customer support bot for a financial services company with real access to tools (via the Model Context Protocol / MCP) including `read_file`, `send_email`, `delete_file`, and `transfer_funds`.
