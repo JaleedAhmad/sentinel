@@ -38,20 +38,22 @@ def generate_report(log_file, comp_file, output_file):
         x_step = graph_w / max(1, total_attempts - 1)
         y_step = graph_h / 4  # Severities 1 to 5, range is 4
 
+        skill_colors = {
+            "roleplay_override": "#58a6ff",
+            "indirect_injection": "#e3b341",
+            "tool_chain_exfiltration": "#8957e5",
+            "destructive_action_injection": "#da3633",
+            "unauthorized_transaction_injection": "#f78166"
+        }
+
         for i, a in enumerate(attack_log):
             sev = a.get('verdict', {}).get('severity', 1)
             cx = padding + i * x_step
             cy = padding + graph_h - ((sev - 1) * y_step)
             is_exploit = a.get('verdict', {}).get('exploit_succeeded', False)
+            skill = a.get('skill_used', 'unknown')
             
-            if sev <= 2:
-                color = "#2ea043" # green
-            elif sev == 3:
-                color = "#d29922" # yellow
-            elif sev == 4:
-                color = "#f85149" # orange
-            else:
-                color = "#da3633" # red
+            color = skill_colors.get(skill, "#8b949e")
 
             points.append({
                 "cx": cx, "cy": cy, "color": color, 
@@ -325,6 +327,14 @@ def generate_report(log_file, comp_file, output_file):
     <h2>Severity Timeline</h2>
     <div style="background: #0d1117; border: 1px solid #30363d; border-radius: 6px; padding: 10px; margin-bottom: 30px; text-align: center;">
         {svg_content}
+        <div style="margin-top: 15px; font-size: 12px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; color: #8b949e;">
+            <div><span style="display:inline-block; width:10px; height:10px; border-radius:50%; background-color:#58a6ff; margin-right:5px;"></span> roleplay_override</div>
+            <div><span style="display:inline-block; width:10px; height:10px; border-radius:50%; background-color:#e3b341; margin-right:5px;"></span> indirect_injection</div>
+            <div><span style="display:inline-block; width:10px; height:10px; border-radius:50%; background-color:#8957e5; margin-right:5px;"></span> tool_chain_exfiltration</div>
+            <div><span style="display:inline-block; width:10px; height:10px; border-radius:50%; background-color:#da3633; margin-right:5px;"></span> destructive_action_injection</div>
+            <div><span style="display:inline-block; width:10px; height:10px; border-radius:50%; background-color:#f78166; margin-right:5px;"></span> unauthorized_transaction_injection</div>
+            <div><span style="display:inline-block; width:10px; height:10px; border-radius:50%; background-color:#8b949e; margin-right:5px;"></span> unknown</div>
+        </div>
     </div>
 
     <h2>Configuration Comparison</h2>
