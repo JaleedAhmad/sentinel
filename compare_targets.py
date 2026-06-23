@@ -1,6 +1,7 @@
 import subprocess
 import os
 import json
+import time
 
 def run_pipeline(config_name: str, early_break: bool = True, max_attempts: int = 6):
     print(f"\n{'='*60}")
@@ -19,12 +20,21 @@ def run_pipeline(config_name: str, early_break: bool = True, max_attempts: int =
     if os.path.exists("summary.json"):
         os.remove("summary.json")
         
-    subprocess.run(["python", "main.py"], env=env)
+    try:
+        subprocess.run(["python", "main.py"], env=env, check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"\n[!] Pipeline aborted mid-run (exit code {e.returncode}). Preserving completed attempts for summary.")
     
     if os.path.exists("attack_log.json"):
         with open("attack_log.json", "r") as f:
-            return json.load(f)
-    return []
+            logs = json.load(f)
+    else:
+        logs = []
+        
+    print("\n[Pacing] Sleeping 30s between runs to clear Groq TPM window...")
+    time.sleep(30)
+    
+    return logs
 
 def aggregate_logs(logs_list):
     total_attempts = 0
@@ -41,17 +51,16 @@ def aggregate_logs(logs_list):
             succeeded = attempt.get("verdict", {}).get("exploit_succeeded", False)
             severity = attempt.get("verdict", {}).get("severity", 1)
             
-            if succeeded:
-                run_succeeded = True
-            
-            if severity > max_severity:
-                max_severity = severity
-                
             if skill not in skill_stats:
                 skill_stats[skill] = {"total": 0, "successes": 0}
             
             skill_stats[skill]["total"] += 1
-            if succeeded:
+            
+            if severity > max_severity:
+                max_severity = severity
+                
+            if succeeded and not run_succeeded:
+                run_succeeded = True
                 skill_stats[skill]["successes"] += 1
                 
         if run_succeeded:
@@ -73,23 +82,27 @@ def aggregate_logs(logs_list):
 def main():
     print("Starting Target Comparison Test...\n")
     
-    # Phase A: Full Loop No Early Break
-    print("\n--- Phase A: Full loop, no early-break (Naive Config) ---")
-    naive_full_log = run_pipeline("naive", early_break=False, max_attempts=4)
+    new_skills = ["destructive_action_injection", "unauthorized_transaction_injection"]
+    all_skills = ["roleplay_override", "indirect_injection", "tool_chain_exfiltration", "privilege_escalation"] + new_skills
     
-    print("\n[PHASE A RAW RESULTS (Naive, No Early Break)]")
-    for attempt in naive_full_log:
-        skill = attempt.get("skill_used", "unknown")
-        succeeded = attempt.get("verdict", {}).get("exploit_succeeded", False)
-        severity = attempt.get("verdict", {}).get("severity", 1)
-        print(f"Skill: {skill} | Succeeded: {succeeded} | Severity: {severity}")
+    # Phase A: Isolate new skills against Naive
+    print("\n--- Phase A: Isolated Skill Evaluation (Naive Config) ---")
+    for skill in new_skills:
+        print(f"\n[PHASE A] Testing {skill}...")
+        os.environ["SENTINEL_TARGET_SKILL"] = skill
+        log = run_pipeline("naive", early_break=False, max_attempts=3)
+        print(f"\n[PHASE A RAW LOG FOR {skill}]")
+        print(json.dumps(log, indent=2))
         
-    # Phase B: 2-Run Aggregated
-    print("\n--- Phase B: 2-Run Aggregated Evaluation (Early-break ON) ---")
+    # Phase B: Aggregated Evaluation
+    print("\n--- Phase B: 2-Run Aggregated Evaluation (Free Choice) ---")
+    if "SENTINEL_TARGET_SKILL" in os.environ:
+        del os.environ["SENTINEL_TARGET_SKILL"]
+        
     naive_logs = []
     for i in range(2):
         print(f"\n[NAIVE - Run {i+1}/2]")
-        naive_logs.append(run_pipeline("naive", early_break=True, max_attempts=6))
+        naive_logs.append(run_pipeline("naive", early_break=False, max_attempts=6))
         
     nudged_logs = []
     for i in range(2):
@@ -99,16 +112,18 @@ def main():
     naive_agg = aggregate_logs(naive_logs)
     nudged_agg = aggregate_logs(nudged_logs)
     
+    runs_per_config = 2
+    
     comparison_results = {
         "naive": {
-            "runs": 2,
+            "runs": runs_per_config,
             "total_attempts": naive_agg["total_attempts_across_runs"],
             "successful_exploits": naive_agg["successful_exploits"],
             "max_severity": naive_agg["max_severity"],
             "success_rate_by_skill": naive_agg["success_rate_by_skill"]
         },
         "nudged": {
-            "runs": 2,
+            "runs": runs_per_config,
             "total_attempts": nudged_agg["total_attempts_across_runs"],
             "successful_exploits": nudged_agg["successful_exploits"],
             "max_severity": nudged_agg["max_severity"],
@@ -125,7 +140,7 @@ def main():
     
     def print_config_stats(name, agg):
         print(f"\n[{name.upper()} CONFIG]")
-        print(f"Total Runs:          2")
+        print(f"Total Runs:          {runs_per_config}")
         print(f"Total Attempts:      {agg['total_attempts_across_runs']}")
         print(f"Successful Exploits: {agg['successful_exploits']}")
         print(f"Max Severity:        {agg['max_severity']}")

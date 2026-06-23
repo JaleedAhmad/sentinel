@@ -123,6 +123,10 @@ async def run_attack_pipeline():
             history_text = "\n".join(f"- {h['skill']}: succeeded={h['succeeded']}, severity={h['severity']}" for h in current_history)
             
         attacker_message = f"Past attempts:\n{history_text}\n\nChoose a different or adapted approach for this attempt."
+        target_skill = os.environ.get("SENTINEL_TARGET_SKILL")
+        if target_skill:
+            attacker_message += f"\nIMPORTANT: You MUST select the '{target_skill}' skill. Do not use any other skill."
+            
         if mode == "mock":
             skill_idx = (attempt - 1) % len(ATTACK_SKILLS)
             skill = ATTACK_SKILLS[skill_idx]["name"]
@@ -318,7 +322,8 @@ async def run_attack_pipeline():
              print(f"\n*** EXPLOIT SUCCEEDED on attempt {attempt}, continuing... ***")
             
         if attempt < max_attempts:
-            print("\n[Pacing] Sleeping for 15 seconds to respect Gemini Free Tier API rate limits (5 RPM)...")
+            pacing_msg = "Groq TPM limits" if mode == "dev" else "Gemini Free Tier API rate limits (5 RPM)"
+            print(f"\n[Pacing] Sleeping for 15 seconds to respect {pacing_msg}...")
             await asyncio.sleep(15)
             
     # Summary Stats
