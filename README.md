@@ -60,6 +60,12 @@ Executes an exhaustive, multi-run comparison against differing target configurat
 SENTINEL_MODE=dev python compare_targets.py
 ```
 
+**HTML Report Generation:**
+Creates a self-contained, offline-ready HTML dashboard summarizing the benchmark run, including timeline visualizations and comparison tables.
+```bash
+python generate_report.py --log attack_log.json --comparison comparison_results.json --output sentinel_report.html
+```
+
 ### Environment Variables
 - `SENTINEL_MODE`: Controls the backend API (`live`, `dev`, `mock`).
 - `SENTINEL_TARGET_CONFIG`: Controls the defensive posture of the Target agent (`naive`, `nudged`).
