@@ -9,6 +9,7 @@
 <text font-family="monospace" font-size="14" font-weight="500" fill="#CECBF6" x="340" y="53" text-anchor="middle" dominant-baseline="central">Orchestrator</text>
 <text font-family="monospace" font-size="12" fill="#AFA9EC" x="340" y="72" text-anchor="middle" dominant-baseline="central">ADK · session management</text>
 <line x1="340" y1="86" x2="160" y2="158" stroke="#8b949e" stroke-width="1" marker-end="url(#arrow)"/>
+<line x1="340" y1="86" x2="520" y2="158" stroke="#8b949e" stroke-width="1" marker-end="url(#arrow)"/>
 <rect x="30" y="158" width="260" height="56" rx="8" fill="#2d1a14" stroke="#993C1D" stroke-width="0.5"/>
 <text font-family="monospace" font-size="14" font-weight="500" fill="#F5C4B3" x="160" y="181" text-anchor="middle" dominant-baseline="central">Attacker agent</text>
 <text font-family="monospace" font-size="12" fill="#F0997B" x="160" y="200" text-anchor="middle" dominant-baseline="central">skill library · Pydantic output</text>
