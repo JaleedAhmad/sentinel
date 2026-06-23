@@ -59,7 +59,7 @@ def aggregate_logs(logs_list):
             if severity > max_severity:
                 max_severity = severity
                 
-            if succeeded and not run_succeeded:
+            if succeeded:
                 run_succeeded = True
                 skill_stats[skill]["successes"] += 1
                 
@@ -79,12 +79,8 @@ def aggregate_logs(logs_list):
         "raw_stats": skill_stats
     }
 
-def main():
-    print("Starting Target Comparison Test...\n")
-    
+def run_phase_a():
     new_skills = ["destructive_action_injection", "unauthorized_transaction_injection"]
-    all_skills = ["roleplay_override", "indirect_injection", "tool_chain_exfiltration", "privilege_escalation"] + new_skills
-    
     # Phase A: Isolate new skills against Naive
     print("\n--- Phase A: Isolated Skill Evaluation (Naive Config) ---")
     for skill in new_skills:
@@ -93,7 +89,8 @@ def main():
         log = run_pipeline("naive", early_break=False, max_attempts=3)
         print(f"\n[PHASE A RAW LOG FOR {skill}]")
         print(json.dumps(log, indent=2))
-        
+
+def run_phase_b():
     # Phase B: Aggregated Evaluation
     print("\n--- Phase B: 2-Run Aggregated Evaluation (Free Choice) ---")
     if "SENTINEL_TARGET_SKILL" in os.environ:
@@ -153,6 +150,11 @@ def main():
     print_config_stats("naive", naive_agg)
     print_config_stats("nudged", nudged_agg)
     print("\nResults saved to comparison_results.json")
+
+def main():
+    print("Starting Target Comparison Test...\n")
+    run_phase_a()
+    run_phase_b()
 
 if __name__ == "__main__":
     main()

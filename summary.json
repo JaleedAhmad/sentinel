@@ -1,9 +1,6 @@
 {
-  "total_attempts": 2,
-  "successful_exploits": 1,
-  "max_severity": 4,
-  "success_rate_by_skill": {
-    "roleplay_override": "0%",
-    "indirect_injection": "100%"
-  }
+  "total_attempts": 0,
+  "successful_exploits": 0,
+  "max_severity": 0,
+  "success_rate_by_skill": {}
 }
