@@ -5,21 +5,21 @@
 </marker>
 </defs>
 <rect width="680" height="400" fill="#0d1117"/>
-<rect x="240" y="30" width="200" height="56" rx="8" fill="#1e1b4b" stroke="#534AB7" stroke-width="0.5"/>
+<rect x="210" y="30" width="260" height="56" rx="8" fill="#1e1b4b" stroke="#534AB7" stroke-width="0.5"/>
 <text font-family="monospace" font-size="14" font-weight="500" fill="#CECBF6" x="340" y="53" text-anchor="middle" dominant-baseline="central">Orchestrator</text>
 <text font-family="monospace" font-size="12" fill="#AFA9EC" x="340" y="72" text-anchor="middle" dominant-baseline="central">ADK · session management</text>
-<line x1="288" y1="86" x2="168" y2="158" stroke="#8b949e" stroke-width="1" marker-end="url(#arrow)"/>
-<rect x="60" y="158" width="200" height="56" rx="8" fill="#2d1a14" stroke="#993C1D" stroke-width="0.5"/>
+<line x1="340" y1="86" x2="160" y2="158" stroke="#8b949e" stroke-width="1" marker-end="url(#arrow)"/>
+<rect x="30" y="158" width="260" height="56" rx="8" fill="#2d1a14" stroke="#993C1D" stroke-width="0.5"/>
 <text font-family="monospace" font-size="14" font-weight="500" fill="#F5C4B3" x="160" y="181" text-anchor="middle" dominant-baseline="central">Attacker agent</text>
 <text font-family="monospace" font-size="12" fill="#F0997B" x="160" y="200" text-anchor="middle" dominant-baseline="central">skill library · Pydantic output</text>
-<line x1="260" y1="186" x2="418" y2="186" stroke="#EF9F27" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="290" y1="186" x2="388" y2="186" stroke="#EF9F27" stroke-width="1.5" marker-end="url(#arrow)"/>
 <text font-family="monospace" font-size="12" fill="#BA7517" x="340" y="176" text-anchor="middle">MCP call</text>
-<rect x="420" y="158" width="200" height="56" rx="8" fill="#0c1929" stroke="#185FA5" stroke-width="0.5"/>
+<rect x="390" y="158" width="260" height="56" rx="8" fill="#0c1929" stroke="#185FA5" stroke-width="0.5"/>
 <text font-family="monospace" font-size="14" font-weight="500" fill="#B5D4F4" x="520" y="181" text-anchor="middle" dominant-baseline="central">Target agent</text>
 <text font-family="monospace" font-size="12" fill="#85B7EB" x="520" y="200" text-anchor="middle" dominant-baseline="central">FastMCP · real tool calls</text>
-<line x1="520" y1="214" x2="392" y2="278" stroke="#8b949e" stroke-width="1" marker-end="url(#arrow)"/>
-<path d="M 440 306 L 640 306 Q 650 306 650 296 L 650 68 Q 650 58 640 58 L 440 58" fill="none" stroke="#8b949e" stroke-width="1" marker-end="url(#arrow)"/>
-<rect x="240" y="278" width="200" height="56" rx="8" fill="#0a1f1a" stroke="#0F6E56" stroke-width="0.5"/>
+<line x1="520" y1="214" x2="340" y2="278" stroke="#8b949e" stroke-width="1" marker-end="url(#arrow)"/>
+<path d="M 470 306 L 660 306 Q 670 306 670 296 L 670 68 Q 670 58 660 58 L 470 58" fill="none" stroke="#8b949e" stroke-width="1" marker-end="url(#arrow)"/>
+<rect x="210" y="278" width="260" height="56" rx="8" fill="#0a1f1a" stroke="#0F6E56" stroke-width="0.5"/>
 <text font-family="monospace" font-size="14" font-weight="500" fill="#9FE1CB" x="340" y="301" text-anchor="middle" dominant-baseline="central">Judge agent</text>
 <text font-family="monospace" font-size="12" fill="#5DCAA5" x="340" y="320" text-anchor="middle" dominant-baseline="central">severity 1–5 · tool-call evidence</text>
 <line x1="340" y1="334" x2="340" y2="354" stroke="#8b949e" stroke-width="1" marker-end="url(#arrow)"/>
