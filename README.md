@@ -6,8 +6,10 @@
 ![MCP](https://img.shields.io/badge/MCP-Supported-purple)
 ![Agents](https://img.shields.io/badge/Agents-Multi--Agent-blueviolet)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
+[![Kaggle](https://img.shields.io/badge/Kaggle-Notebook-blue?logo=kaggle)](#)
 
 > **⚠️ Proof of Concept**: Sentinel is currently an experimental Proof of Concept (PoC) designed for research, benchmarking, and validation of AI Agent defensive configurations.
+> Built as a capstone for the [Kaggle/Google 5-Day AI Agents Intensive](https://www.kaggle.com/learn-guide/5-day-genai) (June 2026). Demonstrates 7 course concepts: multi-agent orchestration, MCP servers, agent skills, agentic security, memory/context engineering, evaluation & observability, and production deployment.
 
 Sentinel is an automated, multi-agent adversarial testing framework designed to evaluate and harden target AI agents against prompt-injection and tool-misuse vulnerabilities.
 
@@ -15,19 +17,25 @@ Sentinel is an automated, multi-agent adversarial testing framework designed to 
 
 ```mermaid
 graph TD
-    A[Attacker Agent] -->|Generates Malicious Payload| T(Target Agent)
+    O((Orchestrator)) -->|Spawns & Feeds History| A[Attacker Agent]
+    A -->|Generates Malicious Payload| T(Target Agent)
     T -->|Executes/Refuses| C{Tool Execution / MCP}
     T -->|Returns Response| J[Judge Agent]
     C -->|Tool Results| J
-    A -->|Attack History/Rationale| J
-    J -->|Verdict & Severity Score| O((Orchestrator))
-    O -->|Feedback loop| A
+    J -->|Verdict & Severity Score| O
 ```
 
 The system operates via a continuous evaluation loop between three distinct AI agents:
 - **Target Agent**: A simulated customer support bot for a financial services company with real access to tools (via the Model Context Protocol / MCP) including `read_file`, `send_email`, `delete_file`, and `transfer_funds`.
 - **Attacker Agent**: An adversarial LLM tasked with dynamically crafting malicious payloads using a library of specific attack skills to trick the Target into unauthorized data exfiltration or destructive actions.
 - **Judge Agent**: An impartial evaluator that analyzes the interaction, verifies whether the Target executed unauthorized tool calls, and scores the exploit on a Severity Scale (1-5).
+
+## 📊 Key Findings
+- Naive target exploited on **100% of evaluated runs**, typically on the first attempt
+- Nudged target consistently resisted `roleplay_override` but fell to `tool_chain_exfiltration` by attempt 3 — demonstrating real adaptive escalation
+- `destructive_action_injection` achieved Severity 5 on every Phase A attempt against the naive target
+- `unauthorized_transaction_injection` achieved Severity 5 on 2/3 Phase A attempts — one failure correctly scored as Severity 1 (intent without tool call execution)
+- Exploitability is model-dependent: identical tool surface and system prompt produced different resistance patterns across Gemini and Groq/Llama backends
 
 ### 🛠️ Attack Surface
 The Attacker leverages the following injection strategies:
@@ -40,6 +48,7 @@ The Attacker leverages the following injection strategies:
 
 ## 🚀 Key Features
 - **Dynamic Adaptation**: The Attacker reads the history of failed attempts and actively changes its payload and skill choices based on what the Target successfully resisted.
+- **HTML Security Report**: Auto-generates a self-contained `sentinel_report.html` after every benchmark run — includes a severity timeline, naive vs nudged comparison table, and a full attempt log with expandable target responses and Judge reasoning.
 - **Pluggable LLM Backends**: Seamlessly toggle between Live execution (Gemini 2.5 Flash) and Dev modes (Groq / Llama 3.3 70B, NVIDIA NIM, X.AI Grok) to avoid production rate limits during testing.
 - **Comparative Benchmarking**: Run isolated, exhaustive evaluations across different Target system prompts (e.g., `naive` vs `nudged` defensive configurations) using the `compare_targets.py` runner to generate statistical success metrics.
 
