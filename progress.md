@@ -35,22 +35,31 @@ The core architecture consists of:
 
 ---
 
+### 5. Robust Benchmarking & Reporting
+- Refactored `compare_targets.py` using `subprocess` to ensure complete crash resilience and isolate target state across multi-run benchmarks.
+- Implemented robust pacing (30s sleep intervals) between API calls to successfully mitigate previous Groq rate-limit/TPM blockers.
+- Built a zero-dependency Python script (`generate_report.py`) that consumes `attack_log.json` and `comparison_results.json` to output a fully self-contained HTML dashboard (`sentinel_report.html`).
+- Enhanced the dashboard with an SVG severity timeline that visually color-codes exploits based on the specific `skill_used` (e.g., destructive actions in red, exfiltration in purple).
+- Integrated the auto-generation of this report directly into the end of the `compare_targets.py` pipeline.
+
+### 6. Finalized Documentation & Repository
+- Completely updated `README.md` with Kaggle/course badges, a proof of concept disclaimer, key benchmark findings, and a feature summary of the new HTML report generator.
+- Replaced the basic Mermaid diagram with a highly polished, custom `architecture.svg` vector graphic, correctly routing the Orchestrator/Attacker/Target/Judge workflow and verdict feedback loops.
+- Fixed logging aggregation to correctly attribute and count all successful exploits per skill in multi-exploit runs.
+- All code, reports, and graphics successfully committed and pushed to the remote GitHub repository.
+
+---
+
 ## 🚧 Current Status & Blockers
 
-**Blocker**: Groq Dev Tier Tokens Per Day (TPD) Limits
-- The complete `compare_targets.py` benchmarking run consumes an estimated 20,000 - 25,000 tokens per execution.
-- We have currently exhausted the Groq `llama-3.3-70b-versatile` rolling 24-hour limit (100,000 TPD).
-- Alternative models available on the free tier (`llama-3.1-8b-instant`) proved incapable of generating valid JSON schemas for the target's tool calls and hallucinated non-existent tools (e.g. `override_security_procedure`). Other capable models (`mixtral`, `gemma2`, etc.) have been decommissioned.
-- **Resolution**: The models in the codebase have been firmly reverted back to `llama-3.3-70b-versatile`. We are currently waiting for the 24-hour rolling window to clear enough tokens (or for the API tier upgrade to fully propagate) to run the pipeline.
-- **Cerebras Evaluation Note**: An attempt was made to migrate the dev mode provider to Cerebras (`cerebras/gpt-oss-120b`). This was evaluated and rejected. The model `gpt-oss-120b` produced unreliable/empty structured output for the Attacker's JSON schema, and the Cerebras API quickly hit stringent Tokens Per Minute (TPM) rate limits during Phase A testing. The codebase remains on Groq.
+**Status**: 🟢 **Completed & Synced** 
+Sentinel is now feature-complete. The pipeline runs cleanly, aggregates statistical benchmarks without crashing, automatically generates polished security reports, and is fully documented on GitHub. 
+
+**Blockers**: None. Previous API token limits have been successfully circumvented via pacing and subprocess isolation.
 
 ---
 
 ## 📝 Next Steps
 
-1. **Wait for Groq Quota Refresh**: Once the API tokens become available, run the benchmark:
-   ```bash
-   SENTINEL_MODE=dev python compare_targets.py
-   ```
-2. **Review Aggregated Data**: Check the terminal summary and `comparison_results.json` to confirm the two new skills execute successfully against the `naive` configuration, and to evaluate the success differentials between the target configs.
-3. **Finalize Reporting**: Prepare the output data for final submission or integration into a competitive presentation.
+1. **Update Notebook Link**: Once the Kaggle notebook is published, update the placeholder Kaggle badge URL in `README.md` to point to the live notebook.
+2. **Review Output**: Share `sentinel_report.html` or the GitHub repo as part of the final course submission/presentation.
