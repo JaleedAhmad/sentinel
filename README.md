@@ -9,6 +9,7 @@
 [![Kaggle](https://img.shields.io/badge/Kaggle-Notebook-blue?logo=kaggle)](#)
 
 > **⚠️ Proof of Concept**: Sentinel is currently an experimental Proof of Concept (PoC) designed for research, benchmarking, and validation of AI Agent defensive configurations.
+
 > Built as a capstone for the [Kaggle/Google 5-Day AI Agents Intensive](https://www.kaggle.com/learn-guide/5-day-genai) (June 2026). Demonstrates 7 course concepts: multi-agent orchestration, MCP servers, agent skills, agentic security, memory/context engineering, evaluation & observability, and production deployment.
 
 Sentinel is an automated, multi-agent adversarial testing framework designed to evaluate and harden target AI agents against prompt-injection and tool-misuse vulnerabilities.
@@ -37,7 +38,7 @@ The system operates via a continuous evaluation loop between three distinct AI a
 - `unauthorized_transaction_injection` achieved Severity 5 on 2/3 Phase A attempts — one failure correctly scored as Severity 1 (intent without tool call execution)
 - Exploitability is model-dependent: identical tool surface and system prompt produced different resistance patterns across Gemini and Groq/Llama backends
 
-### 🛠️ Attack Surface
+## 🛠️ Attack Surface
 The Attacker leverages the following injection strategies:
 - `direct_injection`: Overt commands to misuse tools.
 - `indirect_injection`: Malicious instructions embedded inside documents or data.
