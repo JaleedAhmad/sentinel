@@ -10,7 +10,8 @@ def run_pipeline(config_name: str, early_break: bool = True, max_attempts: int =
     print(f"{'='*60}\n")
     
     env = os.environ.copy()
-    env["SENTINEL_MODE"] = "dev"
+    if "SENTINEL_MODE" not in env:
+        env["SENTINEL_MODE"] = "dev"
     env["SENTINEL_TARGET_CONFIG"] = config_name
     env["SENTINEL_EARLY_BREAK"] = "true" if early_break else "false"
     env["SENTINEL_MAX_ATTEMPTS"] = str(max_attempts)
