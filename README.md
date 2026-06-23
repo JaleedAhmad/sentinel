@@ -1,8 +1,24 @@
 # Sentinel — Agentic Red-Teaming Pipeline
 
+![Python](https://img.shields.io/badge/Python-3.12-blue?logo=python&logoColor=white)
+![LLM](https://img.shields.io/badge/LLM-Gemini%20|%20Groq%20|%20Llama3-orange)
+![Security](https://img.shields.io/badge/Security-Red--Teaming-red)
+![License](https://img.shields.io/badge/License-MIT-green.svg)
+
 Sentinel is an automated, multi-agent adversarial testing framework designed to evaluate and harden target AI agents against prompt-injection and tool-misuse vulnerabilities.
 
 ## 🏗️ Architecture
+
+```mermaid
+graph TD
+    A[Attacker Agent] -->|Generates Malicious Payload| T(Target Agent)
+    T -->|Executes/Refuses| C{Tool Execution / MCP}
+    T -->|Returns Response| J[Judge Agent]
+    C -->|Tool Results| J
+    A -->|Attack History/Rationale| J
+    J -->|Verdict & Severity Score| O((Orchestrator))
+    O -->|Feedback loop| A
+```
 
 The system operates via a continuous evaluation loop between three distinct AI agents:
 - **Target Agent**: A simulated customer support bot for a financial services company with real access to tools (via the Model Context Protocol / MCP) including `read_file`, `send_email`, `delete_file`, and `transfer_funds`.
@@ -71,3 +87,7 @@ python generate_report.py --log attack_log.json --comparison comparison_results.
 - `SENTINEL_TARGET_CONFIG`: Controls the defensive posture of the Target agent (`naive`, `nudged`).
 - `SENTINEL_MAX_ATTEMPTS`: Limits the number of adversarial iterations per evaluation (default: `5`).
 - `SENTINEL_EARLY_BREAK`: Set to `false` to force an exhaustive test of all skills even after a successful exploit.
+
+## 📄 License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
