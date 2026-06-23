@@ -151,6 +151,10 @@ def run_phase_b():
     print_config_stats("naive", naive_agg)
     print_config_stats("nudged", nudged_agg)
     print("\nResults saved to comparison_results.json")
+    
+    print("\n[Report] Generating sentinel_report.html...")
+    os.system("python generate_report.py")
+    print("[Report] Done. Open sentinel_report.html to view results.")
 
 def main():
     print("Starting Target Comparison Test...\n")
