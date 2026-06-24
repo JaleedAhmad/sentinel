@@ -2,7 +2,7 @@ import os
 import json
 import asyncio
 from fastapi import FastAPI
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import BaseModel
 from typing import Optional
 
@@ -13,6 +13,10 @@ app = FastAPI(title="Sentinel Framework API")
 class RunRequest(BaseModel):
     mode: str = "dev"
     config: str = "naive"
+
+@app.get("/")
+def root():
+    return RedirectResponse(url="/report")
 
 @app.get("/health")
 def health():

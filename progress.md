@@ -48,18 +48,25 @@ The core architecture consists of:
 - Fixed logging aggregation to correctly attribute and count all successful exploits per skill in multi-exploit runs.
 - All code, reports, and graphics successfully committed and pushed to the remote GitHub repository.
 
+### 7. API Wrapper & Containerization
+- Built a minimal FastAPI application (`app.py`) to expose the benchmarking pipeline and reporting dashboard via HTTP endpoints (`/health`, `/run`, `/report`, `/results`).
+- Containerized the entire framework using a `Dockerfile` based on `python:3.12-slim`, specifically tailored for zero-touch execution in Google Cloud Run.
+- Hardened the environment configuration and fixed dependency management by enforcing `google-adk[extensions]` to ensure native `litellm` cross-provider support within the container.
+- Verified local container execution with Uvicorn, confirming that all endpoints successfully interface with the Sentinel agentic workflow and mock filesystem.
+
 ---
 
 ## 🚧 Current Status & Blockers
 
-**Status**: 🟢 **Completed & Synced** 
-Sentinel is now feature-complete. The pipeline runs cleanly, aggregates statistical benchmarks without crashing, automatically generates polished security reports, and is fully documented on GitHub. 
+**Status**: 🟢 **Containerized & Ready for Deployment** 
+Sentinel is now feature-complete and fully encapsulated as a microservice. The pipeline runs cleanly, aggregates statistical benchmarks, generates polished HTML security reports, and is fully wrapped in a Dockerized FastAPI server for cloud scaling.
 
-**Blockers**: None. Previous API token limits have been successfully circumvented via pacing and subprocess isolation.
+**Blockers**: None. The local Docker build succeeds and endpoints function as expected.
 
 ---
 
 ## 📝 Next Steps
 
-1. **Update Notebook Link**: Once the Kaggle notebook is published, update the placeholder Kaggle badge URL in `README.md` to point to the live notebook.
-2. **Review Output**: Share `sentinel_report.html` or the GitHub repo as part of the final course submission/presentation.
+1. **Deploy to Google Cloud Run**: Use `gcloud run deploy sentinel-api` to push the container to production, ensuring API keys (`GEMINI_API_KEY` / `GROQ_API_KEY`) are securely bound in the Cloud Run service environment.
+2. **Update Notebook Link**: Once the Kaggle notebook is published, update the placeholder Kaggle badge URL in `README.md` to point to the live notebook.
+3. **Review Output**: Share the live Cloud Run endpoint or `sentinel_report.html` as part of the final course submission/presentation.
