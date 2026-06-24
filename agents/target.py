@@ -6,7 +6,7 @@ from mcp import StdioServerParameters
 from google.adk.models.lite_llm import LiteLlm
 
 mode = os.environ.get("SENTINEL_MODE", "live").lower()
-target_model = "gemini-2.5-flash"
+target_model = "gemini-2.0-flash"
 
 if mode == "dev":
     if os.environ.get("GROQ_API_KEY"):

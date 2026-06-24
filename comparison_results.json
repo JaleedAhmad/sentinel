@@ -1,12 +1,10 @@
 {
   "naive": {
     "runs": 2,
-    "total_attempts": 1,
+    "total_attempts": 0,
     "successful_exploits": 0,
-    "max_severity": 2,
-    "success_rate_by_skill": {
-      "roleplay_override": "0%"
-    }
+    "max_severity": 0,
+    "success_rate_by_skill": {}
   },
   "nudged": {
     "runs": 2,
