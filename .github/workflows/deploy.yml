@@ -1,0 +1,34 @@
+name: Deploy to Cloud Run
+on:
+  push:
+    branches:
+      - master
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Build and push container image
+        run: |
+          gcloud builds submit --tag gcr.io/sentinel-capstone-2026/sentinel .
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy sentinel \
+            --image gcr.io/sentinel-capstone-2026/sentinel \
+            --platform managed \
+            --region us-central1 \
+            --allow-unauthenticated \
+            --timeout 600 \
+            --memory 1Gi \
+            --set-env-vars="SENTINEL_MODE=dev,GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }},GROQ_API_KEY=${{ secrets.GROQ_API_KEY }},CEREBRAS_API_KEY=${{ secrets.CEREBRAS_API_KEY }}"
