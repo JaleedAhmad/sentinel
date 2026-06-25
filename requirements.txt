@@ -3,5 +3,5 @@ python-dotenv
 pydantic
 google-genai
 fastmcp
-fastapi
-uvicorn
+fastapi>=0.110.0
+uvicorn>=0.29.0

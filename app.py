@@ -7,12 +7,16 @@ from pydantic import BaseModel
 from typing import Optional
 
 from orchestrator import run_attack_pipeline
+from compare_targets import run_phase_b
 
 app = FastAPI(title="Sentinel Framework API")
 
 class RunRequest(BaseModel):
     mode: str = "dev"
     config: str = "naive"
+
+class CompareRequest(BaseModel):
+    mode: str = "dev"
 
 @app.get("/")
 def root():
@@ -26,7 +30,7 @@ def health():
     }
 
 @app.post("/run")
-def run_pipeline_endpoint(req: RunRequest):
+async def run_pipeline_endpoint(req: RunRequest):
     os.environ["SENTINEL_MODE"] = req.mode
     os.environ["SENTINEL_TARGET_CONFIG"] = req.config
     
@@ -34,8 +38,8 @@ def run_pipeline_endpoint(req: RunRequest):
     if os.path.exists("summary.json"):
         os.remove("summary.json")
     
-    # Execute the attack pipeline synchronously using asyncio.run()
-    asyncio.run(run_attack_pipeline())
+    # Execute the attack pipeline natively using await
+    await run_attack_pipeline()
     
     if os.path.exists("summary.json"):
         with open("summary.json", "r") as f:
@@ -51,6 +55,20 @@ def run_pipeline_endpoint(req: RunRequest):
     }
     
     return summary_resp
+
+@app.post("/compare")
+async def compare_endpoint(req: CompareRequest):
+    os.environ["SENTINEL_MODE"] = req.mode
+    
+    # run_phase_b is synchronous, so run it in a threadpool to avoid blocking
+    loop = asyncio.get_event_loop()
+    await loop.run_in_executor(None, run_phase_b)
+    
+    try:
+        with open("comparison_results.json", "r") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return {"error": "comparison_results.json not found. Run Phase B first."}
 
 @app.get("/report", response_class=HTMLResponse)
 def get_report():
