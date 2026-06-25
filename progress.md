@@ -54,14 +54,19 @@ The core architecture consists of:
 - Hardened the environment configuration and fixed dependency management by enforcing `google-adk[extensions]` to ensure native `litellm` cross-provider support within the container.
 - Verified local container execution with Uvicorn, confirming that all endpoints successfully interface with the Sentinel agentic workflow and mock filesystem.
 
+### 8. Automated CI/CD & Deployment
+- Set up a dedicated GCP IAM Service Account (`sentinel-deployer`) with granular permissions (`roles/run.admin`, `roles/storage.admin`, `roles/cloudbuild.builds.builder`, `roles/logging.viewer`).
+- Created a GitHub Actions workflow (`deploy.yml`) to automatically build and deploy the container to Google Cloud Run on every push to the `master` branch.
+- Resolved race conditions in the stateless Cloud Run environment by forcing the `POST /run` endpoint to generate the HTML report synchronously before returning, ensuring `GET /report` immediately serves the freshest data.
+
 ---
 
 ## 🚧 Current Status & Blockers
 
-**Status**: 🟢 **Containerized & Ready for Deployment** 
-Sentinel is now feature-complete and fully encapsulated as a microservice. The pipeline runs cleanly, aggregates statistical benchmarks, generates polished HTML security reports, and is fully wrapped in a Dockerized FastAPI server for cloud scaling.
+**Status**: 🟢 **Deployed & Automated** 
+Sentinel is now feature-complete and fully deployed to Google Cloud Run with an active GitHub Actions CI/CD pipeline. The pipeline runs cleanly, aggregates statistical benchmarks, generates polished HTML security reports synchronously, and serves them from a stateless Cloud Run instance.
 
-**Blockers**: None. The local Docker build succeeds and endpoints function as expected.
+**Blockers**: None. The automated pipeline is green.
 
 ---
 

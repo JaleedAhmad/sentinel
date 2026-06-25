@@ -45,6 +45,7 @@ The Attacker leverages the following injection strategies:
 - **Dynamic Adaptation**: The Attacker reads the history of failed attempts and actively changes its payload and skill choices based on what the Target successfully resisted.
 - **HTML Security Report**: Auto-generates a self-contained `sentinel_report.html` after every benchmark run — includes a severity timeline, naive vs nudged comparison table, and a full attempt log with expandable target responses and Judge reasoning.
 - **Pluggable LLM Backends**: Seamlessly toggle between Live execution (Gemini 2.5 Flash) and Dev modes (Groq / Llama 3.3 70B, NVIDIA NIM, X.AI Grok) to avoid production rate limits during testing.
+- **Automated CI/CD Deployment**: Fully integrated with GitHub Actions for zero-touch deployment to Google Cloud Run upon every push to the `master` branch.
 - **Comparative Benchmarking**: Run isolated, exhaustive evaluations across different Target system prompts (e.g., `naive` vs `nudged` defensive configurations) using the `compare_targets.py` runner to generate statistical success metrics.
 
 ## ⚙️ Quick Start
