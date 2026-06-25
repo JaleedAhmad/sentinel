@@ -8,6 +8,7 @@ from typing import Optional
 
 from orchestrator import run_attack_pipeline
 from compare_targets import run_phase_b
+from generate_report import generate_report
 
 app = FastAPI(title="Sentinel Framework API")
 
@@ -40,6 +41,9 @@ async def run_pipeline_endpoint(req: RunRequest):
     
     # Execute the attack pipeline natively using await
     await run_attack_pipeline()
+    
+    # Regenerate report synchronously
+    generate_report("attack_log.json", "comparison_results.json", "sentinel_report.html")
     
     if os.path.exists("summary.json"):
         with open("summary.json", "r") as f:
