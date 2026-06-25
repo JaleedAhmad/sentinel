@@ -12,6 +12,8 @@
 
 > Built as a capstone for the [Kaggle/Google 5-Day AI Agents Intensive](https://www.kaggle.com/learn-guide/5-day-genai) (June 2026). Demonstrates 7 course concepts: multi-agent orchestration, MCP servers, agent skills, agentic security, memory/context engineering, evaluation & observability, and production deployment.
 
+> 🌐 **Live Deployment**: View the live Sentinel Red-Team Report dashboard at [https://sentinel-398081109917.us-central1.run.app](https://sentinel-398081109917.us-central1.run.app)
+
 Sentinel is an automated, multi-agent adversarial testing framework designed to evaluate and harden target AI agents against prompt-injection and tool-misuse vulnerabilities.
 
 ## 🏗️ Architecture
