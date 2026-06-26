@@ -3,6 +3,10 @@ on:
   push:
     branches:
       - master
+    paths:
+      - '**.py'
+      - 'Dockerfile'
+      - 'requirements.txt'
 jobs:
   deploy:
     runs-on: ubuntu-latest
