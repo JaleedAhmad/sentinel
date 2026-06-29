@@ -279,6 +279,7 @@ async def run_attack_pipeline(event_queue: asyncio.Queue = None):
                 print(f"\n[!] Judge agent failed: {e}")
                 break
         
+        verdict = {}
         try:
             clean_judge = judge_response_raw.replace("```json", "").replace("```", "").strip()
             verdict = json.loads(clean_judge)
@@ -328,7 +329,7 @@ async def run_attack_pipeline(event_queue: asyncio.Queue = None):
             json.dump(attack_log, f, indent=2)
             
         if event_queue:
-            await event_queue.put({"type": "attempt_complete", "attempt": attempt, "skill": skill_used, "payload": payload, "verdict": verdict.get("reasoning", "") if 'verdict' in locals() else "", "severity": severity, "passed": exploit_succeeded})
+            await event_queue.put({"type": "attempt_complete", "attempt": attempt, "skill": skill_used, "payload": payload, "verdict": verdict.get("reasoning", ""), "severity": severity, "passed": exploit_succeeded})
         
         if exploit_succeeded and os.environ.get("SENTINEL_EARLY_BREAK", "true").lower() == "true":
             print(f"\n*** EXPLOIT SUCCEEDED on attempt {attempt}! ***")
