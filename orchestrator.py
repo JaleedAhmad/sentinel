@@ -74,7 +74,7 @@ async def run_agent(agent, user_input: str, session_id: str, user_id: str = "tes
             
     return final_text, tool_calls
 
-async def run_attack_pipeline():
+async def run_attack_pipeline(event_queue: asyncio.Queue = None):
     print("--- Starting Sentinel Day 3 Pipeline ---")
     
     mode = os.environ.get("SENTINEL_MODE", "live").lower()
@@ -112,6 +112,9 @@ async def run_attack_pipeline():
     current_history = []
     max_attempts = int(os.environ.get("SENTINEL_MAX_ATTEMPTS", "5"))
     attacker_session_id = "attacker-run-1"
+    
+    if event_queue:
+        await event_queue.put({"type": "pipeline_start", "max_attempts": max_attempts})
     
     for attempt in range(1, max_attempts + 1):
         print(f"\n=== Attempt {attempt} of {max_attempts} ===")
@@ -188,6 +191,9 @@ async def run_attack_pipeline():
         print(f"Rationale: {rationale}")
         print(f"Payload:\n{payload}")
         
+        if event_queue:
+            await event_queue.put({"type": "attacker_payload", "attempt": attempt, "skill": skill_used, "payload": payload})
+        
         # 2. Target processes payload
         print("\n[2] Target processing payload...")
         target_session_id = f"session-target-{attempt}"
@@ -223,6 +229,9 @@ async def run_attack_pipeline():
             print(f"Target tool calls: {[tc.name for tc in target_tools]}")
         else:
             print("Target tool calls: None")
+            
+        if event_queue:
+            await event_queue.put({"type": "target_response", "attempt": attempt, "response": target_response})
             
         # 3. Judge evaluates the exchange
         print("\n[3] Judge evaluating...")
@@ -283,6 +292,9 @@ async def run_attack_pipeline():
         print("\n[Verdict]")
         print(judge_response_raw)
         
+        if event_queue:
+            await event_queue.put({"type": "judge_verdict", "attempt": attempt, "severity": severity, "passed": exploit_succeeded})
+        
         # Record attempt history
         current_history.append({
             "skill": skill_used,
@@ -314,6 +326,9 @@ async def run_attack_pipeline():
         
         with open("attack_log.json", "w") as f:
             json.dump(attack_log, f, indent=2)
+            
+        if event_queue:
+            await event_queue.put({"type": "attempt_complete", "attempt": attempt, "skill": skill_used, "payload": payload, "verdict": verdict.get("reasoning", "") if 'verdict' in locals() else "", "severity": severity, "passed": exploit_succeeded})
         
         if exploit_succeeded and os.environ.get("SENTINEL_EARLY_BREAK", "true").lower() == "true":
             print(f"\n*** EXPLOIT SUCCEEDED on attempt {attempt}! ***")
@@ -353,7 +368,10 @@ async def run_attack_pipeline():
     }
     
     with open("summary.json", "w") as f:
-        json.dump(summary, f, indent=2)
+            json.dump(summary, f, indent=2)
+
+    if event_queue:
+        await event_queue.put({"type": "pipeline_complete", "total_attempts": total_attempts, "max_severity": max_severity})
 
     print("\n--- Run Summary ---")
     print(f"Total Attempts: {total_attempts}")

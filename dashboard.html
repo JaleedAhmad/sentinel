@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentinel Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --text-color: #c9d1d9;
+            --panel-bg: #161b22;
+            --border-color: #30363d;
+            --attacker-color: #da3633;
+            --target-color: #e3b341;
+            --judge-color: #2ea043;
+            
+            --sev-1: #8b949e;
+            --sev-2: #58a6ff;
+            --sev-3: #e3b341;
+            --sev-4: #f78166;
+            --sev-5: #da3633;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            text-align: center;
+            margin-top: 40px;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: #ffffff;
+        }
+
+        .header p {
+            margin: 5px 0 0 0;
+            font-size: 1.1rem;
+            color: #8b949e;
+        }
+
+        .diagram-container {
+            margin: 20px 0;
+        }
+
+        .status-bar {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 40px;
+            width: 80%;
+            max-width: 800px;
+            text-align: center;
+            min-height: 28px;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+            width: 90%;
+            max-width: 1200px;
+            padding-bottom: 100px;
+        }
+
+        .attempt-card {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .card-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .skill-name {
+            font-size: 0.9rem;
+            color: #8b949e;
+            font-family: monospace;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .sev-1 { background-color: var(--sev-1); }
+        .sev-2 { background-color: var(--sev-2); }
+        .sev-3 { background-color: var(--sev-3); }
+        .sev-4 { background-color: var(--sev-4); }
+        .sev-5 { background-color: var(--sev-5); }
+
+        .card-body p {
+            margin: 0;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .card-label {
+            font-weight: 600;
+            color: #58a6ff;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            margin-top: 10px;
+            margin-bottom: 4px;
+        }
+
+        .text-content {
+            background-color: #010409;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            word-wrap: break-word;
+        }
+
+        .run-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: var(--attacker-color);
+            color: white;
+            border: none;
+            border-radius: 24px;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(218, 54, 51, 0.4);
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .run-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+            background-color: #f85149;
+        }
+
+        .run-btn:disabled {
+            background-color: #30363d;
+            cursor: not-allowed;
+            box-shadow: none;
+            color: #8b949e;
+        }
+
+        /* SVG Animations */
+        @keyframes dash {
+            from { stroke-dashoffset: 0; }
+            to { stroke-dashoffset: -20; }
+        }
+
+        .edge {
+            stroke: #484f58;
+            stroke-width: 3;
+            stroke-dasharray: 10, 10;
+            fill: none;
+            transition: stroke 0.3s;
+        }
+
+        .edge.active-attacker {
+            stroke: var(--attacker-color);
+            animation: dash 0.4s linear infinite;
+        }
+
+        .edge.active-target {
+            stroke: var(--target-color);
+            animation: dash 0.4s linear infinite;
+        }
+
+        .node {
+            fill: var(--panel-bg);
+            stroke-width: 2;
+            transition: all 0.3s;
+        }
+
+        .node-attacker { stroke: var(--attacker-color); }
+        .node-target { stroke: var(--target-color); }
+        .node-judge { stroke: var(--judge-color); }
+
+        .node-text {
+            fill: #ffffff;
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            text-anchor: middle;
+            dominant-baseline: central;
+        }
+
+        @keyframes flashJudge {
+            0% { fill: var(--panel-bg); }
+            50% { fill: var(--flash-color); stroke-width: 4px; }
+            100% { fill: var(--panel-bg); }
+        }
+
+        .flash-judge {
+            animation: flashJudge 1s ease-out;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Sentinel</h1>
+        <p>Multi-Agent Red Team System</p>
+    </div>
+
+    <div class="diagram-container">
+        <svg width="600" height="100" viewBox="0 0 600 100">
+            <!-- Edges -->
+            <path id="edge1" class="edge" d="M 160 50 L 250 50" />
+            <polygon id="arrow1" points="240,45 250,50 240,55" fill="#484f58" />
+            
+            <path id="edge2" class="edge" d="M 370 50 L 460 50" />
+            <polygon id="arrow2" points="450,45 460,50 450,55" fill="#484f58" />
+
+            <!-- Nodes -->
+            <!-- Attacker -->
+            <rect id="node-attacker" class="node node-attacker" x="40" y="25" width="120" height="50" rx="8" ry="8" />
+            <text x="100" y="50" class="node-text">Attacker</text>
+
+            <!-- Target -->
+            <rect id="node-target" class="node node-target" x="250" y="25" width="120" height="50" rx="8" ry="8" />
+            <text x="310" y="50" class="node-text">Target</text>
+
+            <!-- Judge -->
+            <rect id="node-judge" class="node node-judge" x="460" y="25" width="120" height="50" rx="8" ry="8" />
+            <text x="520" y="50" class="node-text">Judge</text>
+        </svg>
+    </div>
+
+    <div class="status-bar" id="statusBar">Waiting...</div>
+
+    <div class="grid-container" id="cardsGrid">
+        <!-- Cards injected here -->
+    </div>
+
+    <button class="run-btn" id="runBtn">Run Pipeline</button>
+
+    <script>
+        const runBtn = document.getElementById('runBtn');
+        const statusBar = document.getElementById('statusBar');
+        const cardsGrid = document.getElementById('cardsGrid');
+        
+        const edge1 = document.getElementById('edge1');
+        const arrow1 = document.getElementById('arrow1');
+        const edge2 = document.getElementById('edge2');
+        const arrow2 = document.getElementById('arrow2');
+        const nodeJudge = document.getElementById('node-judge');
+        const nodeAttacker = document.getElementById('node-attacker');
+
+        let maxAttempts = 0;
+        let eventSource = null;
+
+        function truncate(str, n) {
+            if (!str) return "";
+            return (str.length > n) ? str.slice(0, n - 1) + '&hellip;' : str;
+        }
+
+        function getSevColor(sev) {
+            const colors = {
+                1: '#8b949e',
+                2: '#58a6ff',
+                3: '#e3b341',
+                4: '#f78166',
+                5: '#da3633'
+            };
+            return colors[sev] || colors[1];
+        }
+
+        function resetEdges() {
+            edge1.className.baseVal = "edge";
+            arrow1.setAttribute("fill", "#484f58");
+            edge2.className.baseVal = "edge";
+            arrow2.setAttribute("fill", "#484f58");
+            nodeAttacker.style.fill = 'var(--panel-bg)';
+        }
+
+        runBtn.addEventListener('click', () => {
+            runBtn.disabled = true;
+            cardsGrid.innerHTML = '';
+            resetEdges();
+            statusBar.textContent = "Connecting to pipeline...";
+
+            if (eventSource) {
+                eventSource.close();
+            }
+
+            eventSource = new EventSource('/stream');
+
+            eventSource.onmessage = (e) => {
+                const data = JSON.parse(e.data);
+                
+                switch (data.type) {
+                    case 'pipeline_start':
+                        maxAttempts = data.max_attempts;
+                        statusBar.textContent = `Pipeline Started (Max Attempts: ${maxAttempts})`;
+                        // Activate attacker visually
+                        nodeAttacker.style.fill = 'rgba(218, 54, 51, 0.2)';
+                        resetEdges();
+                        break;
+
+                    case 'attacker_payload':
+                        statusBar.textContent = `Attempt ${data.attempt} of ${maxAttempts} — Attacker generated payload`;
+                        resetEdges();
+                        edge1.className.baseVal = "edge active-attacker";
+                        arrow1.setAttribute("fill", "var(--attacker-color)");
+                        break;
+
+                    case 'target_response':
+                        statusBar.textContent = `Attempt ${data.attempt} of ${maxAttempts} — Target responded`;
+                        resetEdges();
+                        edge2.className.baseVal = "edge active-target";
+                        arrow2.setAttribute("fill", "var(--target-color)");
+                        break;
+
+                    case 'judge_verdict':
+                        statusBar.textContent = `Attempt ${data.attempt} of ${maxAttempts} — Judge scored Severity ${data.severity}`;
+                        // Flash judge node
+                        nodeJudge.style.setProperty('--flash-color', getSevColor(data.severity));
+                        nodeJudge.classList.remove('flash-judge');
+                        // Trigger reflow
+                        void nodeJudge.offsetWidth; 
+                        nodeJudge.classList.add('flash-judge');
+                        break;
+
+                    case 'attempt_complete':
+                        const card = document.createElement('div');
+                        card.className = 'attempt-card';
+                        
+                        const payloadTrunc = truncate(data.payload, 120);
+                        const verdictTrunc = truncate(data.verdict, 100);
+                        
+                        card.innerHTML = `
+                            <div class="card-header">
+                                <span class="card-title">Attempt ${data.attempt}</span>
+                                <span class="badge sev-${data.severity}">Sev ${data.severity}</span>
+                            </div>
+                            <div class="skill-name">${data.skill}</div>
+                            <div class="card-body">
+                                <div class="card-label">Payload</div>
+                                <div class="text-content"><p>${payloadTrunc}</p></div>
+                                <div class="card-label">Judge Verdict</div>
+                                <div class="text-content"><p>${verdictTrunc}</p></div>
+                            </div>
+                        `;
+                        cardsGrid.appendChild(card);
+                        break;
+
+                    case 'pipeline_complete':
+                        statusBar.textContent = `Complete — Total Attempts: ${data.total_attempts}, Max severity: ${data.max_severity}`;
+                        resetEdges();
+                        runBtn.disabled = false;
+                        nodeAttacker.style.fill = 'var(--panel-bg)';
+                        eventSource.close();
+                        break;
+                }
+            };
+
+            eventSource.onerror = (err) => {
+                console.error("EventSource failed:", err);
+                statusBar.textContent = "Error: Stream connection lost.";
+                runBtn.disabled = false;
+                resetEdges();
+                eventSource.close();
+            };
+        });
+    </script>
+</body>
+</html>
