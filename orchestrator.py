@@ -77,7 +77,7 @@ async def run_agent(agent, user_input: str, session_id: str, user_id: str = "tes
 async def run_attack_pipeline(event_queue: asyncio.Queue = None):
     print("--- Starting Sentinel Day 3 Pipeline ---")
     
-    mode = os.environ.get("SENTINEL_MODE", "live").lower()
+    mode = os.environ.get("SENTINEL_MODE", "dev").lower()
     
     dev_endpoint = None
     dev_model = None
@@ -309,7 +309,7 @@ async def run_attack_pipeline(event_queue: asyncio.Queue = None):
             "skill_used": skill_used,
             "payload": payload,
             "target_response": target_response,
-            "tool_calls": [tc.name for tc in target_tools] if target_tools else [],
+            "target_tool_calls": [tc.name for tc in target_tools] if target_tools else [],
             "verdict": {
                 "exploit_succeeded": exploit_succeeded,
                 "severity": severity,
