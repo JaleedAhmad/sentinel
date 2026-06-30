@@ -103,7 +103,7 @@ async def run_attack_pipeline(event_queue: asyncio.Queue = None):
         else:
             raise ValueError("DEV MODE Error: You must set GROQ_API_KEY, GROK_API_KEY, or NVIDIA_API_KEY in your environment.")
         
-        print(f"=== RUNNING IN DEV MODE — Attacker/Judge/Target all via {dev_provider} ({dev_model}) ===")
+        print(f"=== RUNNING IN DEV MODE — Attacker/Judge via {dev_provider} ({dev_model}), Target via Gemini (native ADK + tools) ===")
     elif mode == "mock":
         print("=== RUNNING IN MOCK MODE — NO LIVE GEMINI CALLS FOR ATTACKER/JUDGE ===")
     else:
