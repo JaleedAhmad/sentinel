@@ -42,9 +42,10 @@ The Attacker leverages the following injection strategies:
 - `unauthorized_transaction_injection`: Exploitation of the `transfer_funds` endpoint.
 
 ## 🚀 Key Features
+- **Live Web Dashboard**: A real-time FastAPI web interface (`/dashboard`) featuring an animated 4-node SVG architecture diagram that visualizes the attack pipeline over Server-Sent Events (SSE) as payloads are generated, executed, and judged.
 - **Dynamic Adaptation**: The Attacker reads the history of failed attempts and actively changes its payload and skill choices based on what the Target successfully resisted.
-- **HTML Security Report**: Auto-generates a self-contained `sentinel_report.html` after every benchmark run — includes a severity timeline, naive vs nudged comparison table, and a full attempt log with expandable target responses and Judge reasoning.
-- **Pluggable LLM Backends**: Seamlessly toggle between Live execution (Gemini 2.5 Flash) and Dev modes (Groq / Llama 3.3 70B, NVIDIA NIM, X.AI Grok) to avoid production rate limits during testing.
+- **HTML Security Report**: Auto-generates a self-contained `sentinel_report.html` after every benchmark run — includes a severity timeline, naive vs nudged comparison table, and a full attempt log.
+- **Hybrid LLM Routing**: Seamlessly toggle DEV mode to route the heavy Attacker and Judge generation to free-tier APIs (Groq / Llama 3.3 70B, NVIDIA NIM, X.AI Grok) while keeping the Target agent grounded in native Gemini (Google ADK) to securely execute actual FastMCP tool calls.
 - **Automated CI/CD Deployment**: Fully integrated with GitHub Actions for zero-touch deployment to Google Cloud Run upon every push to the `master` branch.
 - **Comparative Benchmarking**: Run isolated, exhaustive evaluations across different Target system prompts (e.g., `naive` vs `nudged` defensive configurations) using the `compare_targets.py` runner to generate statistical success metrics.
 
@@ -67,17 +68,14 @@ cp .env.example .env
 
 ### 3. Execution Modes
 
-**Live Interactive Attack Loop:**
-Runs the standard single-session pipeline.
-```bash
-python main.py
-```
+### 3. Execution Modes
 
-**Dev Mode (No Gemini Quota):**
-Overrides the backend with free-tier APIs (e.g. Groq) for high-volume testing without hitting Gemini rate limits.
+**Live Web Dashboard (Recommended):**
+Runs the Sentinel framework behind a FastAPI server, exposing a real-time SSE streaming dashboard and report viewer.
 ```bash
-SENTINEL_MODE=dev python main.py
+uvicorn app:app --port 8080
 ```
+Navigate to `http://127.0.0.1:8080/dashboard` in your browser to launch the pipeline and watch the live animation. The framework runs in `DEV` mode by default, leveraging Groq for Attacker/Judge and Gemini for the Target.
 
 **Aggregated Benchmarking:**
 Executes an exhaustive, multi-run comparison against differing target configurations (Naive vs. Defensive Nudge) and exports results to `comparison_results.json`.

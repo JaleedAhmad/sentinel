@@ -59,19 +59,27 @@ The core architecture consists of:
 - Created a GitHub Actions workflow (`deploy.yml`) to automatically build and deploy the container to Google Cloud Run on every push to the `master` branch.
 - Resolved race conditions in the stateless Cloud Run environment by forcing the `POST /run` endpoint to generate the HTML report synchronously before returning, ensuring `GET /report` immediately serves the freshest data.
 
+### 9. Real-Time UI Observability
+- Refactored `orchestrator.py` and `app.py` to stream attack events asynchronously using Server-Sent Events (SSE) and an `asyncio.Queue`, enabling real-time visual tracking of the pipeline without blocking backend execution.
+- Built a dynamic frontend (`dashboard.html`) featuring an animated 4-node SVG architecture map (Orchestrator -> Attacker -> Target -> Judge) that lights up step-by-step as payloads are executed and judged.
+- Implemented a `/clear-log` endpoint and a minimal persistent navbar across the UI for seamless cross-navigation and rapid environment resetting between demo runs.
+- Resolved key mismatches and edge cases (e.g., null Target responses escaping) in the `generate_report.py` logic, ensuring robust offline HTML generation even when the target strictly uses tool calls with no conversational output.
+- Finalized Hybrid LLM routing (`dev` mode) where the heavy Attacker and Judge generation uses Groq while the Target stays native to Gemini (Google ADK) for authentic FastMCP tool binding, drastically reducing rate limits and 503 errors.
+
 ---
 
 ## 🚧 Current Status & Blockers
 
-**Status**: 🟢 **Deployed & Automated** 
-Sentinel is now feature-complete and fully deployed to Google Cloud Run with an active GitHub Actions CI/CD pipeline. The pipeline runs cleanly, aggregates statistical benchmarks, generates polished HTML security reports synchronously, and serves them from a stateless Cloud Run instance.
+**Status**: 🟢 **Feature Complete & Demo Ready** 
+Sentinel is now fully complete. The real-time SSE dashboard, hybrid LLM routing, and robust reporting mechanisms are all active and committed to the `dev` branch.
 
-**Blockers**: None. The automated pipeline is green.
+**Blockers**: 🔴 **GCP Billing Suspended**
+The automated GitHub Actions CI/CD pipeline to Cloud Run is currently failing with a `403` error because the GCP project `sentinel-capstone-2026` has a disabled/closed billing account. The pipeline and code are correct; GCP billing must be reactivated manually in the console.
 
 ---
 
 ## 📝 Next Steps
 
-1. **Deploy to Google Cloud Run**: Use `gcloud run deploy sentinel-api` to push the container to production, ensuring API keys (`GEMINI_API_KEY` / `GROQ_API_KEY`) are securely bound in the Cloud Run service environment.
-2. **Update Notebook Link**: Once the Kaggle notebook is published, update the placeholder Kaggle badge URL in `README.md` to point to the live notebook.
-3. **Review Output**: Share the live Cloud Run endpoint or `sentinel_report.html` as part of the final course submission/presentation.
+1. **Reactivate GCP Billing**: Log into the Google Cloud Console, reactivate the billing account for `sentinel-capstone-2026`, and re-run the GitHub Action to push the latest dashboard features to Cloud Run.
+2. **Record Demo**: Utilize the `/dashboard` UI and `/clear-log` endpoint to record a smooth, end-to-end 5-attempt attack visualization.
+3. **Update Notebook Link**: Once the Kaggle notebook is published, update the placeholder Kaggle badge URL in `README.md` to point to the live notebook.
