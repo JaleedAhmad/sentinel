@@ -1,14 +1,17 @@
 import os
 import json
 import asyncio
+from dotenv import load_dotenv
 from fastapi import FastAPI
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, StreamingResponse, FileResponse
 from pydantic import BaseModel
 from typing import Optional
 
 from orchestrator import run_attack_pipeline
 from compare_targets import run_phase_b
 from generate_report import generate_report
+
+load_dotenv()
 
 app = FastAPI(title="Sentinel Framework API")
 
@@ -90,6 +93,35 @@ def get_results():
             return json.load(f)
     except FileNotFoundError:
         return {"error": "comparison_results.json not found. Run Phase B first."}
+
+@app.post("/clear-log")
+async def clear_log():
+    with open("attack_log.json", "w") as f:
+        json.dump([], f)
+    return {"status": "cleared"}
+
+@app.get("/stream")
+async def stream_pipeline():
+    queue = asyncio.Queue()
+
+    async def run():
+        await run_attack_pipeline(event_queue=queue)
+        generate_report("attack_log.json", "comparison_results.json", "sentinel_report.html")
+
+    asyncio.create_task(run())
+
+    async def event_generator():
+        while True:
+            event = await queue.get()
+            yield f"data: {json.dumps(event)}\n\n"
+            if event.get("type") == "pipeline_complete":
+                break
+
+    return StreamingResponse(event_generator(), media_type="text/event-stream")
+
+@app.get("/dashboard")
+async def dashboard():
+    return FileResponse("dashboard.html")
 
 if __name__ == "__main__":
     import uvicorn

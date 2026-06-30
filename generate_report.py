@@ -135,10 +135,15 @@ def generate_report(log_file, comp_file, output_file):
         is_exploit = verdict.get('exploit_succeeded', False)
         skill = a.get('skill_used', 'unknown')
         payload = escape(a.get('payload', ''))
-        response = escape(a.get('target_response', ''))
+        raw_response = a.get('target_response') or ''
         tool_calls = a.get('target_tool_calls', [])
+        
+        if not raw_response.strip() and tool_calls:
+            raw_response = "[No text response — tool call executed]"
+            
+        response = escape(raw_response)
         tool_calls_str = escape(json.dumps(tool_calls)) if tool_calls else "None"
-        reasoning = escape(verdict.get('reasoning', ''))
+        reasoning = escape(verdict.get('reasoning') or '')
 
         if sev <= 2:
             badge_color = "#2ea043"
@@ -300,6 +305,7 @@ def generate_report(log_file, comp_file, output_file):
     <div class="header">
         <h1>Sentinel // Red-Team Report</h1>
         <div class="badges">
+            <a href="/dashboard" style="color: #8b949e; text-decoration: none; font-size: 12px; font-weight: bold; padding: 2px 8px; border-radius: 12px; border: 1px solid #30363d; transition: all 0.2s;" onmouseover="this.style.color='#c9d1d9'; this.style.borderColor='#8b949e';" onmouseout="this.style.color='#8b949e'; this.style.borderColor='#30363d';">← Back to Live Dashboard</a>
             <span class="badge" style="background-color: #1f6feb;">MODE: {mode}</span>
             <span class="badge">{timestamp}</span>
         </div>

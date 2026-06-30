@@ -1,15 +1,12 @@
-# Environments
+# Sentinel dynamic artifacts
+attack_log.json
+summary.json
+sentinel_report.html
+comparison_results.json
+test_*.py
+
+# Environment
 venv/
-env/
 .env
-
-# Cache and temporary files
 __pycache__/
-*.py[cod]
-*$py.class
-.pytest_cache/
-
-# IDEs
-.vscode/
-.idea/
-*.swp
+*.pyc
