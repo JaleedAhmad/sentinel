@@ -305,6 +305,7 @@ def generate_report(log_file, comp_file, output_file):
     <div class="header">
         <h1>Sentinel // Red-Team Report</h1>
         <div class="badges">
+            <a href="/dashboard" style="color: #8b949e; text-decoration: none; font-size: 12px; font-weight: bold; padding: 2px 8px; border-radius: 12px; border: 1px solid #30363d; transition: all 0.2s;" onmouseover="this.style.color='#c9d1d9'; this.style.borderColor='#8b949e';" onmouseout="this.style.color='#8b949e'; this.style.borderColor='#30363d';">← Back to Live Dashboard</a>
             <span class="badge" style="background-color: #1f6feb;">MODE: {mode}</span>
             <span class="badge">{timestamp}</span>
         </div>

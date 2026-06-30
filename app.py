@@ -94,6 +94,12 @@ def get_results():
     except FileNotFoundError:
         return {"error": "comparison_results.json not found. Run Phase B first."}
 
+@app.post("/clear-log")
+async def clear_log():
+    with open("attack_log.json", "w") as f:
+        json.dump([], f)
+    return {"status": "cleared"}
+
 @app.get("/stream")
 async def stream_pipeline():
     queue = asyncio.Queue()

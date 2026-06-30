@@ -34,6 +34,47 @@
             align-items: center;
         }
 
+        .top-nav {
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 10px 20px;
+            box-sizing: border-box;
+            background-color: #010409;
+            border-bottom: 1px solid var(--border-color);
+            gap: 15px;
+        }
+
+        .top-nav a {
+            color: #8b949e;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .top-nav a:hover {
+            color: #c9d1d9;
+        }
+
+        #clear-log-btn {
+            background-color: #21262d;
+            color: #8b949e;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        #clear-log-btn:hover {
+            background-color: #30363d;
+            color: #c9d1d9;
+            border-color: #8b949e;
+        }
+
         .header {
             text-align: center;
             margin-top: 40px;
@@ -258,6 +299,11 @@
 </head>
 <body>
 
+    <div class="top-nav">
+        <a href="/report" target="_blank">View Full Report →</a>
+        <button id="clear-log-btn">Clear Log</button>
+    </div>
+
     <div class="header">
         <h1>Sentinel</h1>
         <p>Multi-Agent Red Team System</p>
@@ -337,6 +383,13 @@
             arrow2.setAttribute("fill", "#484f58");
             nodeAttacker.style.fill = 'var(--panel-bg)';
         }
+
+        document.getElementById('clear-log-btn').addEventListener('click', async () => {
+            if (!confirm('Clear all logged attempts? This cannot be undone.')) return;
+            await fetch('/clear-log', { method: 'POST' });
+            cardsGrid.innerHTML = '';
+            statusBar.textContent = 'Log cleared. Ready to run.';
+        });
 
         runBtn.addEventListener('click', () => {
             runBtn.disabled = true;
