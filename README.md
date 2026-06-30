@@ -12,7 +12,7 @@
 
 > Built as a capstone for the [Kaggle/Google 5-Day AI Agents Intensive](https://www.kaggle.com/learn-guide/5-day-genai) (June 2026). Demonstrates 7 course concepts: multi-agent orchestration, MCP servers, agent skills, agentic security, memory/context engineering, evaluation & observability, and production deployment.
 
-> 🌐 **Live Deployment**: View the live Sentinel Red-Team Report dashboard at [https://sentinel-398081109917.us-central1.run.app](https://sentinel-398081109917.us-central1.run.app)
+> 🌐 **Live Deployment**: View the live Sentinel Red-Team Report dashboard at [https://sentinel-398081109917.us-central1.run.app/dashboard](https://sentinel-398081109917.us-central1.run.app/dashboard)
 > 
 > 📓 **Kaggle Notebook**: Explore the code and run the pipeline interactively on Kaggle: [https://www.kaggle.com/code/jaleedahmad02/sentinel](https://www.kaggle.com/code/jaleedahmad02/sentinel)
 
