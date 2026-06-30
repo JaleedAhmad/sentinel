@@ -135,10 +135,10 @@ def generate_report(log_file, comp_file, output_file):
         is_exploit = verdict.get('exploit_succeeded', False)
         skill = a.get('skill_used', 'unknown')
         payload = escape(a.get('payload', ''))
-        response = escape(a.get('target_response', ''))
+        response = escape(a.get('target_response') or '')
         tool_calls = a.get('target_tool_calls', [])
         tool_calls_str = escape(json.dumps(tool_calls)) if tool_calls else "None"
-        reasoning = escape(verdict.get('reasoning', ''))
+        reasoning = escape(verdict.get('reasoning') or '')
 
         if sev <= 2:
             badge_color = "#2ea043"
