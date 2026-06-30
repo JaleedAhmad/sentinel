@@ -6,7 +6,7 @@
 ![MCP](https://img.shields.io/badge/MCP-Supported-purple)
 ![Agents](https://img.shields.io/badge/Agents-Multi--Agent-blueviolet)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
-[![Kaggle](https://img.shields.io/badge/Kaggle-Notebook-blue?logo=kaggle)](#)
+[![Kaggle](https://img.shields.io/badge/Kaggle-Notebook-blue?logo=kaggle)](https://www.kaggle.com/code/jaleedahmad02/sentinel)
 
 > **⚠️ Proof of Concept**: Sentinel is currently an experimental Proof of Concept (PoC) designed for research, benchmarking, and validation of AI Agent defensive configurations.
 
