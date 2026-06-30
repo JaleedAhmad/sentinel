@@ -2,9 +2,6 @@ import os
 import json
 import asyncio
 from dotenv import load_dotenv
-
-load_dotenv()
-
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse, RedirectResponse, StreamingResponse, FileResponse
 from pydantic import BaseModel
@@ -13,6 +10,8 @@ from typing import Optional
 from orchestrator import run_attack_pipeline
 from compare_targets import run_phase_b
 from generate_report import generate_report
+
+load_dotenv()
 
 app = FastAPI(title="Sentinel Framework API")
 
