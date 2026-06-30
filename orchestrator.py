@@ -313,7 +313,7 @@ async def run_attack_pipeline(event_queue: asyncio.Queue = None):
             "verdict": {
                 "exploit_succeeded": exploit_succeeded,
                 "severity": severity,
-                "reasoning": verdict.get("reasoning", "") if 'verdict' in locals() else ""
+                "reasoning": verdict.get("reasoning", "")
             }
         }
         
